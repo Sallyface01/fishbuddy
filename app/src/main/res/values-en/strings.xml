@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FishBuddy</string>
+
+    <!-- Tabs -->
+    <string name="tab_analyze">Analyze</string>
+    <string name="tab_spots">Spots</string>
+    <string name="tab_guide">Guide</string>
+    <string name="tab_history">History</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Home -->
+    <string name="home_title">FishBuddy</string>
+    <string name="home_subtitle">Snap a photo, know the fish, catch with confidence</string>
+    <string name="home_analyze_button">Analyze Water</string>
+    <string name="home_hint">Take or choose a water photo</string>
+    <string name="home_footer">📍 Auto GPS · Smart Fish Analysis</string>
+
+    <!-- Loading -->
+    <string name="loading_compressing">Compressing image…</string>
+    <string name="loading_location">Fetching location…</string>
+    <string name="loading_classifying">Identifying water type…</string>
+    <string name="loading_querying">Matching local species…</string>
+    <string name="loading_wait">This may take a few seconds</string>
+
+    <!-- Analysis Result -->
+    <string name="result_title">Analysis Result</string>
+    <string name="result_water_overview">Water Overview</string>
+    <string name="result_water_type">Water Type: %s</string>
+    <string name="result_water_conditions">Conditions: %s</string>
+    <string name="result_location">Location: %s</string>
+    <string name="result_possible_fish">Possible Species (%d)</string>
+    <string name="result_recommended_methods">Recommended Methods</string>
+    <string name="result_done">Done</string>
+    <string name="result_reanalyze">Re-analyze</string>
+    <string name="result_recommended_bait">Bait: %s</string>
+    <string name="result_technique">Technique: %s</string>
+
+    <!-- History -->
+    <string name="history_title">Analysis History</string>
+    <string name="history_no_records">No analysis records yet</string>
+    <string name="history_no_records_hint">Take your first water photo to get started</string>
+    <string name="history_delete">Delete Record</string>
+    <string name="history_delete_all">Clear All Records</string>
+    <string name="history_delete_confirm">Delete all analysis records? This cannot be undone.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_guide">User Guide</string>
+    <string name="settings_data">Data Management</string>
+
+    <!-- Spots -->
+    <string name="spots_title">Fishing Spots</string>
+    <string name="spots_my_spots">My Spots · %d</string>
+    <string name="spots_no_spots">No saved spots\nLong-press on the map to add</string>
+    <string name="spots_add">Add Spot</string>
+    <string name="spots_name">Spot Name</string>
+    <string name="spots_water_type">Water Type</string>
+    <string name="spots_notes">Notes (optional)</string>
+    <string name="spots_save">Save</string>
+    <string name="spots_cancel">Cancel</string>
+    <string name="spots_delete">Delete Spot</string>
+    <string name="spots_delete_confirm">Delete this spot?</string>
+    <string name="spots_copy">Copy Coordinates</string>
+    <string name="spots_navigate">Navigate</string>
+    <string name="spots_location">Location: %s</string>
+    <string name="spots_unnamed">Unnamed Spot</string>
+
+    <!-- Guide -->
+    <string name="guide_title">Fish Guide</string>
+    <string name="guide_search">Search fish species</string>
+    <string name="guide_all_regions">All Regions</string>
+    <string name="guide_clear_filters">Clear Filters</string>
+    <string name="guide_no_results">No matching species found</string>
+    <string name="guide_no_results_hint">Try adjusting filters or search terms</string>
+
+    <!-- Species Detail -->
+    <string name="species_overview">Overview</string>
+    <string name="species_methods">Recommended Methods</string>
+    <string name="species_bait">Recommended Bait</string>
+    <string name="species_season">Best Season: %s</string>
+    <string name="species_time">Best Time: %s</string>
+    <string name="species_size">Typical Size: %s</string>
+    <string name="species_catch_log">My Catch Log</string>
+    <string name="species_catch_count">%d times</string>
+    <string name="species_log_catch">Log a Catch</string>
+    <string name="species_catch_notes">Notes</string>
+    <string name="species_catch_location">Location (optional)</string>
+    <string name="species_no_catch">(No notes)</string>
+    <string name="species_close">Close</string>
+
+    <!-- General -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="close">Close</string>
+    <string name="done">Done</string>
+
+    <!-- Water types -->
+    <string name="water_river">River</string>
+    <string name="water_lake">Lake</string>
+    <string name="water_pond">Pond</string>
+    <string name="water_reservoir">Reservoir</string>
+    <string name="water_stream">Stream</string>
+
+    <!-- Regions -->
+    <string name="region_east">East China</string>
+    <string name="region_south">South China</string>
+    <string name="region_central">Central China</string>
+    <string name="region_north">North China</string>
+    <string name="region_southwest">Southwest China</string>
+    <string name="region_northeast">Northeast China</string>
+    <string name="region_northwest">Northwest China</string>
+
+    <!-- Difficulty -->
+    <string name="difficulty_beginner">Beginner</string>
+    <string name="difficulty_intermediate">Intermediate</string>
+    <string name="difficulty_advanced">Advanced</string>
+</resources>

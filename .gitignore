@@ -1,0 +1,31 @@
+# Android / Gradle
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# App build outputs
+app/build/
+
+# Gradle wrapper jar (binary, use gradle wrapper task to regenerate)
+# gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+replay_*.log
+app/src/main/assets/data*

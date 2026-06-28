@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">钓鱼助手</string>
+
+    <!-- Tabs -->
+    <string name="tab_analyze">分析</string>
+    <string name="tab_spots">钓点</string>
+    <string name="tab_guide">图鉴</string>
+    <string name="tab_history">记录</string>
+    <string name="tab_settings">设置</string>
+
+    <!-- Home -->
+    <string name="home_title">FishBuddy</string>
+    <string name="home_subtitle">拍照识鱼，一钓一个准</string>
+    <string name="home_analyze_button">分析鱼情</string>
+    <string name="home_hint">拍摄或选择水域照片</string>
+    <string name="home_footer">📍 自动获取位置信息 · 智能分析鱼情</string>
+
+    <!-- Loading -->
+    <string name="loading_compressing">正在压缩图片...</string>
+    <string name="loading_location">正在获取位置...</string>
+    <string name="loading_classifying">正在识别水域类型...</string>
+    <string name="loading_querying">正在匹配当地鱼种...</string>
+    <string name="loading_wait">这可能需要几秒钟</string>
+
+    <!-- Analysis Result -->
+    <string name="result_title">分析结果</string>
+    <string name="result_water_overview">水域概况</string>
+    <string name="result_water_type">水体类型：%s</string>
+    <string name="result_water_conditions">水质简评：%s</string>
+    <string name="result_location">位置：%s</string>
+    <string name="result_possible_fish">可能存在的鱼种 (%d种)</string>
+    <string name="result_recommended_methods">推荐钓法</string>
+    <string name="result_done">完成</string>
+    <string name="result_reanalyze">重新分析</string>
+    <string name="result_recommended_bait">推荐饵料：%s</string>
+    <string name="result_technique">技巧：%s</string>
+
+    <!-- History -->
+    <string name="history_title">分析记录</string>
+    <string name="history_no_records">还没有分析记录</string>
+    <string name="history_no_records_hint">拍摄第一张水域照片开始吧</string>
+    <string name="history_delete">删除记录</string>
+    <string name="history_delete_all">清除所有记录</string>
+    <string name="history_delete_confirm">确定要清除所有分析记录吗？此操作不可撤销。</string>
+
+    <!-- Settings -->
+    <string name="settings_title">设置</string>
+    <string name="settings_about">关于</string>
+    <string name="settings_version">版本</string>
+    <string name="settings_guide">使用说明</string>
+    <string name="settings_data">数据管理</string>
+
+    <!-- Spots -->
+    <string name="spots_title">钓点收藏</string>
+    <string name="spots_my_spots">我的钓点 · %d个</string>
+    <string name="spots_no_spots">还没有收藏的钓点\n长按地图添加钓点</string>
+    <string name="spots_add">添加钓点</string>
+    <string name="spots_name">钓点名称</string>
+    <string name="spots_water_type">水域类型</string>
+    <string name="spots_notes">备注（选填）</string>
+    <string name="spots_save">保存</string>
+    <string name="spots_cancel">取消</string>
+    <string name="spots_delete">删除钓点</string>
+    <string name="spots_delete_confirm">确定要删除这个钓点吗？</string>
+    <string name="spots_copy">复制坐标</string>
+    <string name="spots_navigate">导航</string>
+    <string name="spots_location">位置：%s</string>
+    <string name="spots_unnamed">未命名钓点</string>
+
+    <!-- Guide -->
+    <string name="guide_title">鱼种图鉴</string>
+    <string name="guide_search">搜索鱼种名称</string>
+    <string name="guide_all_regions">全部区域</string>
+    <string name="guide_clear_filters">清除筛选</string>
+    <string name="guide_no_results">没有找到匹配的鱼种</string>
+    <string name="guide_no_results_hint">尝试调整筛选条件或搜索词</string>
+
+    <!-- Species Detail -->
+    <string name="species_overview">简介</string>
+    <string name="species_methods">推荐钓法</string>
+    <string name="species_bait">推荐饵料</string>
+    <string name="species_season">最佳季节：%s</string>
+    <string name="species_time">最佳时段：%s</string>
+    <string name="species_size">常见体型：%s</string>
+    <string name="species_catch_log">我的捕获记录</string>
+    <string name="species_catch_count">%d 次</string>
+    <string name="species_log_catch">记录捕获</string>
+    <string name="species_catch_notes">心得记录</string>
+    <string name="species_catch_location">位置（选填）</string>
+    <string name="species_no_catch">(无文字记录)</string>
+    <string name="species_close">关闭</string>
+
+    <!-- General -->
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="save">保存</string>
+    <string name="delete">删除</string>
+    <string name="close">关闭</string>
+    <string name="done">完成</string>
+
+    <!-- Water types -->
+    <string name="water_river">河流</string>
+    <string name="water_lake">湖泊</string>
+    <string name="water_pond">池塘</string>
+    <string name="water_reservoir">水库</string>
+    <string name="water_stream">溪流</string>
+
+    <!-- Regions -->
+    <string name="region_east">华东</string>
+    <string name="region_south">华南</string>
+    <string name="region_central">华中</string>
+    <string name="region_north">华北</string>
+    <string name="region_southwest">西南</string>
+    <string name="region_northeast">东北</string>
+    <string name="region_northwest">西北</string>
+
+    <!-- Difficulty -->
+    <string name="difficulty_beginner">初级</string>
+    <string name="difficulty_intermediate">中级</string>
+    <string name="difficulty_advanced">高级</string>
+</resources>
