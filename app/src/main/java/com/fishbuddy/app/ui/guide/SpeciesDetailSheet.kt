@@ -47,10 +47,14 @@ fun SpeciesDetailSheet(species: SpeciesDetailJSON, onDismiss: () -> Unit) {
         }
     }
 
-    val imageUrl = remember(species) {
-        species.imageUrl ?: run {
-            val clean = species.scientificName.split(" / ").first().replace(" ", "_")
-            "https://commons.wikimedia.org/wiki/Special:FilePath/${clean}.jpg?width=600"
+    val imageModel = remember(species) {
+        if (species.imageUrl != null) return@remember species.imageUrl
+        val clean = species.scientificName.split(" / ").first().replace(" ", "_")
+        val assetPath = "images/${clean}.jpg"
+        try {
+            context.assets.open(assetPath).use { it.readBytes() }
+        } catch (_: java.io.IOException) {
+            "https://commons.wikimedia.org/wiki/Special:FilePath/${clean}?width=600"
         }
     }
     val fallbackBg = remember(species.commonName) {
@@ -104,7 +108,7 @@ fun SpeciesDetailSheet(species: SpeciesDetailJSON, onDismiss: () -> Unit) {
                     }
                     // Image overlay
                     AsyncImage(
-                        model = ImageRequest.Builder(context).data(imageUrl).crossfade(true).build(),
+                        model = ImageRequest.Builder(context).data(imageModel).crossfade(true).build(),
                         contentDescription = species.commonName,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop

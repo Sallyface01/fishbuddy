@@ -27,11 +27,21 @@ import coil.request.ImageRequest
 import com.fishbuddy.app.service.SpeciesDetailJSON
 import com.fishbuddy.app.ui.theme.AppBlue
 
-/** 根据鱼种学名生成 Wikimedia Commons 图片 URL，无自定义 URL 时自动回退 */
-private fun imageUrlFor(species: SpeciesDetailJSON): String {
+/**
+ * 获取鱼种图片的数据源，优先级：
+ * 1. JSON 中显式指定的 imageUrl
+ * 2. 本地 assets/images/ 中打包的图片（ByteArray）
+ * 3. Wikimedia Commons 远程 URL
+ */
+private fun speciesImageModel(species: SpeciesDetailJSON, context: android.content.Context): Any {
     if (species.imageUrl != null) return species.imageUrl
     val cleanName = species.scientificName.split(" / ").first().replace(" ", "_")
-    return "https://commons.wikimedia.org/wiki/Special:FilePath/${cleanName}.jpg?width=400"
+    val assetPath = "images/${cleanName}.jpg"
+    return try {
+        context.assets.open(assetPath).use { it.readBytes() }
+    } catch (_: java.io.IOException) {
+        "https://commons.wikimedia.org/wiki/Special:FilePath/${cleanName}?width=400"
+    }
 }
 
 /** 用鱼种名称生成一个稳定的颜色，用于兜底头像 */
@@ -128,7 +138,7 @@ fun GuideScreen() {
 @Composable
 private fun GuideCard(species: SpeciesDetailJSON, onClick: () -> Unit) {
     val context = LocalContext.current
-    val imageUrl = imageUrlFor(species)
+    val imageModel = remember(species) { speciesImageModel(species, context) }
     val cardColor = fallbackColor(species.commonName)
 
     Card(
@@ -171,7 +181,7 @@ private fun GuideCard(species: SpeciesDetailJSON, onClick: () -> Unit) {
                 }
                 // Image overlay — covers fallback when loaded
                 AsyncImage(
-                    model = ImageRequest.Builder(context).data(imageUrl).crossfade(true).build(),
+                    model = ImageRequest.Builder(context).data(imageModel).crossfade(true).build(),
                     contentDescription = species.commonName,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
