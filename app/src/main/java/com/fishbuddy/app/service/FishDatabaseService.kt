@@ -55,7 +55,8 @@ class FishDatabaseService(private val context: Context) {
                         CityLevel.REGION -> 0.60
                         else -> 0.50
                     },
-                    typicalMethods = detail.typicalMethods
+                    typicalMethods = detail.typicalMethods,
+                    imageUrl = detail.imageUrl
                 )
             }
         }.sortedByDescending { it.confidence }.take(8)
@@ -208,7 +209,8 @@ data class CityJSON(val center: List<Double>, val description: String, val water
 data class SpeciesDetailJSON(
     val commonName: String, val englishName: String, val scientificName: String,
     val description: String, val typicalMethods: List<String>,
-    val bestBait: List<String>, val bestSeason: String, val bestTime: String, val avgSize: String
+    val bestBait: List<String>, val bestSeason: String, val bestTime: String, val avgSize: String,
+    val imageUrl: String? = null
 )
 data class FishingMethodsJSON(val version: String, val methods: Map<String, MethodDetailJSON>)
 data class MethodDetailJSON(

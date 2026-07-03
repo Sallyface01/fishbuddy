@@ -12,14 +12,33 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.fishbuddy.app.service.SpeciesDetailJSON
 import com.fishbuddy.app.ui.theme.AppBlue
+
+/** 根据鱼种学名生成 Wikimedia Commons 图片 URL，无自定义 URL 时自动回退 */
+private fun imageUrlFor(species: SpeciesDetailJSON): String {
+    if (species.imageUrl != null) return species.imageUrl
+    val cleanName = species.scientificName.split(" / ").first().replace(" ", "_")
+    return "https://commons.wikimedia.org/wiki/Special:FilePath/${cleanName}.jpg?width=400"
+}
+
+/** 用鱼种名称生成一个稳定的颜色，用于兜底头像 */
+private fun fallbackColor(name: String): Color {
+    val hue = name.hashCode().and(0x7FFFFFFF) % 360
+    return Color.hsl(hue.toFloat(), 0.45f, 0.72f)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,29 +108,12 @@ fun GuideScreen() {
                 }
             }
         } else {
-            LazyVerticalGrid(columns = GridCells.Adaptive(160.dp), modifier = Modifier.padding(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(160.dp), modifier = Modifier.padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 items(state.filteredSpecies) { species ->
-                    Card(onClick = { selectedSpecies = species },
-                        shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.WaterDrop, null, tint = AppBlue, modifier = Modifier.size(18.dp))
-                                Spacer(Modifier.width(6.dp))
-                                Text(species.commonName, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            }
-                            Text(species.scientificName, fontStyle = FontStyle.Italic, fontSize = 10.sp, color = Color.Gray)
-                            Text(species.description, fontSize = 11.sp, color = Color.DarkGray, maxLines = 2, modifier = Modifier.padding(top = 4.dp))
-                            Row(Modifier.padding(top = 6.dp)) {
-                                species.typicalMethods.take(2).forEach { m ->
-                                    Surface(shape = RoundedCornerShape(4.dp), color = AppBlue.copy(alpha = 0.08f)) {
-                                        Text(m, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                            color = AppBlue, fontSize = 10.sp)
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    GuideCard(species = species, onClick = { selectedSpecies = species })
                 }
             }
         }
@@ -120,5 +122,64 @@ fun GuideScreen() {
     // Species detail sheet
     if (selectedSpecies != null) {
         SpeciesDetailSheet(selectedSpecies!!) { selectedSpecies = null }
+    }
+}
+
+@Composable
+private fun GuideCard(species: SpeciesDetailJSON, onClick: () -> Unit) {
+    val context = LocalContext.current
+    val imageUrl = imageUrlFor(species)
+    val cardColor = fallbackColor(species.commonName)
+
+    Card(
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column {
+            // --- Image with fallback ---
+            Box(
+                modifier = Modifier.fillMaxWidth().height(120.dp)
+                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                    .background(cardColor.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                // Fallback character (always visible behind image)
+                Text(
+                    text = species.commonName.first().toString(),
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = cardColor,
+                    textAlign = TextAlign.Center
+                )
+                // Image overlay — covers fallback when loaded
+                AsyncImage(
+                    model = ImageRequest.Builder(context).data(imageUrl).crossfade(true).build(),
+                    contentDescription = species.commonName,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            // --- Info ---
+            Column(modifier = Modifier.padding(12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.WaterDrop, null, tint = AppBlue, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(species.commonName, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                }
+                Text(species.scientificName, fontStyle = FontStyle.Italic, fontSize = 10.sp, color = Color.Gray)
+                Text(species.description, fontSize = 11.sp, color = Color.DarkGray, maxLines = 2, modifier = Modifier.padding(top = 4.dp))
+                Row(Modifier.padding(top = 6.dp)) {
+                    species.typicalMethods.take(2).forEach { m ->
+                        Surface(shape = RoundedCornerShape(4.dp), color = AppBlue.copy(alpha = 0.08f)) {
+                            Text(m, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                color = AppBlue, fontSize = 10.sp)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -7,28 +7,30 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.fishbuddy.app.FishBuddyApp
 import com.fishbuddy.app.data.model.CatchLogEntity
 import com.fishbuddy.app.service.SpeciesDetailJSON
 import com.fishbuddy.app.ui.theme.AppBlue
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.io.File
 
 @Composable
 fun SpeciesDetailSheet(species: SpeciesDetailJSON, onDismiss: () -> Unit) {
@@ -45,6 +47,17 @@ fun SpeciesDetailSheet(species: SpeciesDetailJSON, onDismiss: () -> Unit) {
         }
     }
 
+    val imageUrl = remember(species) {
+        species.imageUrl ?: run {
+            val clean = species.scientificName.split(" / ").first().replace(" ", "_")
+            "https://commons.wikimedia.org/wiki/Special:FilePath/${clean}.jpg?width=600"
+        }
+    }
+    val fallbackBg = remember(species.commonName) {
+        val hue = species.commonName.hashCode().and(0x7FFFFFFF) % 360
+        Color.hsl(hue.toFloat(), 0.45f, 0.72f)
+    }
+
     Column(modifier = Modifier.fillMaxSize().background(Color(0xFFF8F9FA))) {
         // Top bar
         Surface(shadowElevation = 2.dp) {
@@ -56,11 +69,37 @@ fun SpeciesDetailSheet(species: SpeciesDetailJSON, onDismiss: () -> Unit) {
             }
         }
 
-        LazyColumn(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        LazyColumn(
+            modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Hero image
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(200.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(fallbackBg.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Fallback character
+                    Text(
+                        text = species.commonName.first().toString(),
+                        fontSize = 64.sp, fontWeight = FontWeight.Bold, color = fallbackBg,
+                        textAlign = TextAlign.Center
+                    )
+                    // Image overlay
+                    AsyncImage(
+                        model = ImageRequest.Builder(context).data(imageUrl).crossfade(true).build(),
+                        contentDescription = species.commonName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+
             // Header
             item {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Filled.WaterDrop, null, tint = AppBlue, modifier = Modifier.size(64.dp))
                     Text(species.commonName, fontWeight = FontWeight.Bold, fontSize = 24.sp)
                     Text(species.englishName, color = Color.Gray)
                     Text(species.scientificName, fontStyle = FontStyle.Italic, fontSize = 12.sp, color = Color.Gray)

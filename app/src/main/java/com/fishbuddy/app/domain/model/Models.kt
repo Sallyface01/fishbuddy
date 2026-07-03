@@ -6,7 +6,8 @@ data class FishSpecies(
     val scientificName: String,
     val description: String,
     val confidence: Double,
-    val typicalMethods: List<String>
+    val typicalMethods: List<String>,
+    val imageUrl: String? = null
 )
 
 /** Fishing method recommendation. */
