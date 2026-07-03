@@ -78,15 +78,30 @@ fun SpeciesDetailSheet(species: SpeciesDetailJSON, onDismiss: () -> Unit) {
                 Box(
                     modifier = Modifier.fillMaxWidth().height(200.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(fallbackBg.copy(alpha = 0.15f)),
+                        .background(fallbackBg.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Fallback character
-                    Text(
-                        text = species.commonName.first().toString(),
-                        fontSize = 64.sp, fontWeight = FontWeight.Bold, color = fallbackBg,
-                        textAlign = TextAlign.Center
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Surface(
+                            shape = RoundedCornerShape(50),
+                            color = fallbackBg.copy(alpha = 0.18f),
+                            modifier = Modifier.size(80.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = species.commonName.first().toString(),
+                                    fontSize = 40.sp, fontWeight = FontWeight.Bold, color = fallbackBg,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                        Text(
+                            text = species.englishName,
+                            fontSize = 11.sp,
+                            color = fallbackBg.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(top = 6.dp)
+                        )
+                    }
                     // Image overlay
                     AsyncImage(
                         model = ImageRequest.Builder(context).data(imageUrl).crossfade(true).build(),

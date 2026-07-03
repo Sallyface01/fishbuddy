@@ -138,21 +138,37 @@ private fun GuideCard(species: SpeciesDetailJSON, onClick: () -> Unit) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column {
-            // --- Image with fallback ---
+            // --- Image with styled fallback ---
             Box(
                 modifier = Modifier.fillMaxWidth().height(120.dp)
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                    .background(cardColor.copy(alpha = 0.15f)),
+                    .background(cardColor.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
-                // Fallback character (always visible behind image)
-                Text(
-                    text = species.commonName.first().toString(),
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = cardColor,
-                    textAlign = TextAlign.Center
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    // Styled avatar: first Chinese character in colored circle
+                    Surface(
+                        shape = RoundedCornerShape(50),
+                        color = cardColor.copy(alpha = 0.18f),
+                        modifier = Modifier.size(56.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = species.commonName.first().toString(),
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = cardColor
+                            )
+                        }
+                    }
+                    // English name below
+                    Text(
+                        text = species.englishName,
+                        fontSize = 9.sp,
+                        color = cardColor.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
                 // Image overlay — covers fallback when loaded
                 AsyncImage(
                     model = ImageRequest.Builder(context).data(imageUrl).crossfade(true).build(),
