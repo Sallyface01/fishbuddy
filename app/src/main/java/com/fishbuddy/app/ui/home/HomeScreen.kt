@@ -1,5 +1,7 @@
 package com.fishbuddy.app.ui.home
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fishbuddy.app.ui.theme.AppBlue
@@ -33,7 +36,6 @@ fun HomeScreen() {
 
     var photoFile by remember { mutableStateOf<File?>(null) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
-    var showCamera by remember { mutableStateOf(false) }
 
     // --- Camera launcher ---
     val cameraLauncher = rememberLauncherForActivityResult(
@@ -43,7 +45,21 @@ fun HomeScreen() {
             val data = photoFile!!.readBytes()
             vm.onImageCaptured(data)
         }
-        showCamera = false
+    }
+
+    // --- 准备拍照文件并启动相机 ---
+    fun launchCamera() {
+        val file = File(context.cacheDir, "fishbuddy_photo.jpg").also { it.parentFile?.mkdirs() }
+        photoFile = file
+        photoUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        cameraLauncher.launch(photoUri!!)
+    }
+
+    // --- CAMERA runtime permission launcher ---
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) launchCamera()
     }
 
     // --- Gallery picker launcher ---
@@ -59,16 +75,6 @@ fun HomeScreen() {
         vm.dismissCameraOptions()
     }
 
-    // Handle camera permission + launch
-    LaunchedEffect(showCamera) {
-        if (showCamera) {
-            val file = File(context.cacheDir, "fishbuddy_photo.jpg").also { it.parentFile?.mkdirs() }
-            photoFile = file
-            photoUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-            cameraLauncher.launch(photoUri!!)
-        }
-    }
-
     // === SOURCE PICKER DIALOG ===
     if (state.showCameraOptions) {
         AlertDialog(
@@ -82,7 +88,14 @@ fun HomeScreen() {
                     TextButton(
                         onClick = {
                             vm.dismissCameraOptions()
-                            showCamera = true
+                            // 先检查 CAMERA 权限
+                            if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                                == PackageManager.PERMISSION_GRANTED
+                            ) {
+                                launchCamera()
+                            } else {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
