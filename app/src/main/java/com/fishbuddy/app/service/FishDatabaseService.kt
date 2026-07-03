@@ -167,8 +167,10 @@ class FishDatabaseService(private val context: Context) {
         }.map { m ->
             FishingRecommendation(
                 method = m.name, bait = m.bait.joinToString("、"),
-                technique = m.technique, bestSeason = m.bestSeason,
-                bestTimeOfDay = m.bestTime, difficulty = m.difficulty
+                technique = m.technique,
+                bestSeason = m.bestSeason ?: "全年",
+                bestTimeOfDay = m.bestTime ?: "全天",
+                difficulty = m.difficulty
             )
         }
     }
@@ -212,5 +214,5 @@ data class FishingMethodsJSON(val version: String, val methods: Map<String, Meth
 data class MethodDetailJSON(
     val name: String, val suitableSpecies: List<String>, val suitableWater: List<String>,
     val bait: List<String>, val technique: String, val difficulty: String,
-    val bestSeason: String, val bestTime: String, val equipment: String
+    val bestSeason: String? = null, val bestTime: String? = null, val equipment: String = ""
 )
