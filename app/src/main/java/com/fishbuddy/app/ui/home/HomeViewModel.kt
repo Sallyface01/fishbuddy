@@ -37,74 +37,82 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
 
     fun onImageCaptured(imageData: ByteArray) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isAnalyzing = true, loadingMessage = "正在压缩图片...")
+            try {
+                _state.value = _state.value.copy(isAnalyzing = true, loadingMessage = "正在压缩图片...")
 
-            // Step 1: Compress
-            val compressed = CameraService.compressImage(imageData)
-            val thumbnail = CameraService.makeThumbnail(compressed)
+                // Step 1: Compress
+                val compressed = CameraService.compressImage(imageData)
+                val thumbnail = CameraService.makeThumbnail(compressed)
 
-            _state.value = _state.value.copy(loadingMessage = "正在获取位置...")
-            // Step 2: Location
-            val location = withContext(Dispatchers.IO) { locationService.fetchCurrentLocation() }
+                _state.value = _state.value.copy(loadingMessage = "正在获取位置...")
+                // Step 2: Location (non-fatal — returns null if permission denied)
+                val location = withContext(Dispatchers.IO) { locationService.fetchCurrentLocation() }
 
-            // Step 2b: Weather (non-fatal)
-            var weather: WeatherData? = null
-            if (location != null) {
-                weather = weatherService.fetchWeather(location.latitude, location.longitude)
+                // Step 2b: Weather (non-fatal)
+                var weather: WeatherData? = null
+                if (location != null) {
+                    weather = weatherService.fetchWeather(location.latitude, location.longitude)
+                }
+
+                _state.value = _state.value.copy(loadingMessage = "正在识别水域类型...")
+                // Step 3: Water classification
+                val (waterType, confidence) = withContext(Dispatchers.IO) {
+                    classifier.classify(compressed)
+                }
+
+                _state.value = _state.value.copy(loadingMessage = "正在匹配当地鱼种...")
+                // Step 4: Query fish database
+                val (species, recommendations) = withContext(Dispatchers.IO) {
+                    db.query(waterType.chineseName, location)
+                }
+
+                // Step 5: Build conditions text
+                val conditions = when {
+                    confidence > 0.5f -> "${waterType.chineseName}，识别置信度 ${(confidence * 100).toInt()}%"
+                    confidence > 0f -> "${waterType.chineseName}，置信度较低"
+                    else -> "自动识别未成功，默认为湖泊类型"
+                }
+
+                // Step 6: Create and save record
+                val fishJSON = gson.toJson(species)
+                val recJSON = gson.toJson(recommendations)
+                val locationName = db.resolveLocationName(location)
+
+                val weatherJSON = weather?.let { gson.toJson(it) }
+
+                val record = AnalysisRecordEntity(
+                    photoData = compressed,
+                    thumbnailData = thumbnail,
+                    latitude = location?.latitude,
+                    longitude = location?.longitude,
+                    locationName = locationName ?: location?.name,
+                    waterBodyType = waterType.chineseName,
+                    waterConditions = conditions,
+                    fishSpeciesJSON = fishJSON,
+                    recommendationsJSON = recJSON,
+                    weatherJSON = weatherJSON
+                )
+
+                withContext(Dispatchers.IO) { appCtx.analysisRepository.insert(record) }
+
+                _state.value = _state.value.copy(
+                    isAnalyzing = false,
+                    analysisResult = record,
+                    resultSpecies = species,
+                    resultRecommendations = recommendations,
+                    resultWaterType = waterType
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    isAnalyzing = false,
+                    errorMessage = "分析失败：${e.message ?: "未知错误"}\n请重试"
+                )
             }
-
-            _state.value = _state.value.copy(loadingMessage = "正在识别水域类型...")
-            // Step 3: Water classification
-            val (waterType, confidence) = withContext(Dispatchers.IO) {
-                classifier.classify(compressed)
-            }
-
-            _state.value = _state.value.copy(loadingMessage = "正在匹配当地鱼种...")
-            // Step 4: Query fish database
-            val (species, recommendations) = withContext(Dispatchers.IO) {
-                db.query(waterType.chineseName, location)
-            }
-
-            // Step 5: Build conditions text
-            val conditions = when {
-                confidence > 0.5f -> "${waterType.chineseName}，识别置信度 ${(confidence * 100).toInt()}%"
-                confidence > 0f -> "${waterType.chineseName}，置信度较低"
-                else -> "自动识别未成功，默认为湖泊类型"
-            }
-
-            // Step 6: Create and save record
-            val fishJSON = gson.toJson(species)
-            val recJSON = gson.toJson(recommendations)
-            val locationName = db.resolveLocationName(location)
-
-            val weatherJSON = weather?.let { gson.toJson(it) }
-
-            val record = AnalysisRecordEntity(
-                photoData = compressed,
-                thumbnailData = thumbnail,
-                latitude = location?.latitude,
-                longitude = location?.longitude,
-                locationName = locationName ?: location?.name,
-                waterBodyType = waterType.chineseName,
-                waterConditions = conditions,
-                fishSpeciesJSON = fishJSON,
-                recommendationsJSON = recJSON,
-                weatherJSON = weatherJSON
-            )
-
-            withContext(Dispatchers.IO) { appCtx.analysisRepository.insert(record) }
-
-            _state.value = _state.value.copy(
-                isAnalyzing = false,
-                analysisResult = record,
-                resultSpecies = species,
-                resultRecommendations = recommendations,
-                resultWaterType = waterType
-            )
         }
     }
 
     fun reset() { _state.value = HomeState() }
+    fun dismissError() { _state.value = _state.value.copy(errorMessage = null) }
 }
 
 data class HomeState(
@@ -114,5 +122,6 @@ data class HomeState(
     val analysisResult: AnalysisRecordEntity? = null,
     val resultSpecies: List<FishSpecies> = emptyList(),
     val resultRecommendations: List<FishingRecommendation> = emptyList(),
-    val resultWaterType: WaterBodyType = WaterBodyType.LAKE
+    val resultWaterType: WaterBodyType = WaterBodyType.LAKE,
+    val errorMessage: String? = null
 )

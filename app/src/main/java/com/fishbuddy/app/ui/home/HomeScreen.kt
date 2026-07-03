@@ -37,12 +37,19 @@ fun HomeScreen() {
     var photoFile by remember { mutableStateOf<File?>(null) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
 
+    // --- LOCATION runtime permission launcher ---
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* granted or not, analysis proceeds */ }
+
     // --- Camera launcher ---
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success && photoFile != null) {
             val data = photoFile!!.readBytes()
+            // 请求定位权限（不阻塞分析流程）
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             vm.onImageCaptured(data)
         }
     }
@@ -69,10 +76,26 @@ fun HomeScreen() {
         if (uri != null) {
             val data = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
             if (data != null) {
+                // 请求定位权限（不阻塞分析流程）
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                 vm.onImageCaptured(data)
             }
         }
         vm.dismissCameraOptions()
+    }
+
+    // === ERROR DIALOG ===
+    if (state.errorMessage != null) {
+        AlertDialog(
+            onDismissRequest = { vm.dismissError() },
+            title = { Text("分析失败", fontWeight = FontWeight.Bold, color = Color.Red) },
+            text = { Text(state.errorMessage ?: "") },
+            confirmButton = {
+                TextButton(onClick = { vm.dismissError() }) {
+                    Text("重试")
+                }
+            }
+        )
     }
 
     // === SOURCE PICKER DIALOG ===
