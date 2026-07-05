@@ -41,7 +41,7 @@ class WaterClassifierService {
 
     private fun keywordsFor(type: WaterBodyType): List<String> = when (type) {
         WaterBodyType.RIVER -> listOf("river", "waterway", "canal", "rapids", "waterfall")
-        WaterBodyType.LAKE -> listOf("lake", "loch", "reservoir", "body_of_water")
+        WaterBodyType.LAKE -> listOf("lake", "loch", "body_of_water")
         WaterBodyType.POND -> listOf("pond", "pool", "swamp", "marsh", "wetland", "lagoon")
         WaterBodyType.RESERVOIR -> listOf("reservoir", "dam", "basin")
         WaterBodyType.STREAM -> listOf("stream", "creek", "brook", "rivulet")
